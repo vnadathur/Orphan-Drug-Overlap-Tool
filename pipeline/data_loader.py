@@ -2,7 +2,7 @@
 
 import re
 
-import pandas as pd  # pyright: ignore[reportMissingImports]
+import pandas as pd  
 
 
 def load_cdsco_data(filepath: str = 'data/cdsco.csv') -> pd.DataFrame:

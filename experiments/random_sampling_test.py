@@ -10,7 +10,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Tuple
 
-import pandas as pd
+import pandas as pd  # pyright: ignore[reportMissingImports]
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)

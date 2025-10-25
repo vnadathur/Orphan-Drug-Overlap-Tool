@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="assets/INDOUSRARE%20LOGO.png" alt="IndoUsRare Logo" width="200"/>
+  <img src="assets/INDOUSRARE%20LOGO.png" alt="IndoUsRare Logo" height="80"/>
   
-  # Orphan Drug Overlap Tool
+# Orphan Drug Overlap Tool
 </div>
 
 ---
