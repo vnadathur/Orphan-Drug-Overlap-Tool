@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/d89de8cf-78c5-41e6-9f58-89e8de2ff10e" alt="IndoUsRare Logo" width="200"/>
+  <img src="assets/indousrare-logo.png" alt="IndoUsRare Logo" width="200"/>
   
   # Orphan Drug Overlap Tool
 </div>
