@@ -1,6 +1,3 @@
-<div align="center">
-  <img src="assets/INDOUSRARE%20LOGO.png" alt="IndoUsRare Logo" width="200"/>
-  
 # Orphan Drug Overlap Tool
 </div>
 
