@@ -33,7 +33,9 @@ def create_overlap_report(matches, output_file: str = 'output/overlap.csv') -> p
     overlap_df = pd.DataFrame(matches)
     
     overlap_df['CDSCO_Approval_Date_Formatted'] = standardize_dates(overlap_df['cdsco_approval_date'])
-    overlap_df['FDA_Approval_Date_Formatted'] = standardize_dates(overlap_df['fda_approval_date'])
+    overlap_df['FDA_Marketing_Approval_Date_Formatted'] = standardize_dates(
+        overlap_df['fda_marketing_approval_date']
+    )
     
     output_df = pd.DataFrame(
         {
@@ -41,11 +43,14 @@ def create_overlap_report(matches, output_file: str = 'output/overlap.csv') -> p
             'Drug_Name_FDA': overlap_df['fda_drug'],
             'Indication_CDSCO': overlap_df['cdsco_indication'],
             'Indication_FDA': overlap_df['fda_indication'],
-            'Approval_Date_CDSCO': overlap_df['CDSCO_Approval_Date_Formatted'],
-            'Approval_Date_FDA': overlap_df['FDA_Approval_Date_Formatted'],
+            'CDSCO_Approval_Date': overlap_df['CDSCO_Approval_Date_Formatted'],
+            'FDA_Marketing_Approval_Date': overlap_df['FDA_Marketing_Approval_Date_Formatted'],
             'Match_Score': overlap_df['match_score'],
             'FDA_Generic_Name': overlap_df['fda_generic'],
-            'FDA_Trade_Name': overlap_df['fda_trade']
+            'FDA_Trade_Name': overlap_df['fda_trade'],
+            'FDA_Sponsor_Company': overlap_df['fda_sponsor_company'],
+            'FDA_Sponsor_State': overlap_df['fda_sponsor_state'],
+            'FDA_Sponsor_Country': overlap_df['fda_sponsor_country']
         }
     ).sort_values('Match_Score', ascending=False)
 
@@ -94,8 +99,8 @@ def analyze_matches(overlap_df: pd.DataFrame) -> None:
     if len(large_diff) > 0:
         print(f"  - {len(large_diff)} matches have very different indication lengths (review for false positives)")
     
-    missing_cdsco_dates = overlap_df[overlap_df['Approval_Date_CDSCO'] == ''].shape[0]
-    missing_fda_dates = overlap_df[overlap_df['Approval_Date_FDA'] == ''].shape[0]
+    missing_cdsco_dates = overlap_df[overlap_df['CDSCO_Approval_Date'] == ''].shape[0]
+    missing_fda_dates = overlap_df[overlap_df['FDA_Marketing_Approval_Date'] == ''].shape[0]
     
     if missing_cdsco_dates > 0:
         print(f"  - {missing_cdsco_dates} CDSCO drugs missing approval dates")

@@ -53,6 +53,13 @@ def load_fda_data(filepath: str = 'data/FDA.csv') -> pd.DataFrame:
     
     df['Marketing Approval Date'] = df['Marketing Approval Date'].fillna('').astype(str).str.strip()
     
+    sponsor_columns = ['Sponsor Company', 'Sponsor State', 'Sponsor Country']
+    for column in sponsor_columns:
+        if column in df.columns:
+            df[column] = df[column].fillna('').astype(str).str.strip()
+        else:
+            df[column] = ''
+    
     return df
 
 

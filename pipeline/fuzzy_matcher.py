@@ -343,7 +343,10 @@ class EnhancedDrugMatcher:
                 'generic': row.get('Generic Name', ''),
                 'trade': row.get('Trade Name', ''),
                 'indication': row.get('Approved Labeled Indication', ''),
-                'approval_date': row.get('Marketing Approval Date', ''),
+                'marketing_approval_date': row.get('Marketing Approval Date', ''),
+                'sponsor_company': row.get('Sponsor Company', ''),
+                'sponsor_state': row.get('Sponsor State', ''),
+                'sponsor_country': row.get('Sponsor Country', ''),
                 'index': row.name
             })
         
@@ -403,7 +406,10 @@ class EnhancedDrugMatcher:
                         'fda_generic': match_result.fda_drug['generic'],
                         'fda_trade': match_result.fda_drug['trade'],
                         'fda_indication': match_result.fda_drug['indication'],
-                        'fda_approval_date': match_result.fda_drug['approval_date'],
+                        'fda_marketing_approval_date': match_result.fda_drug.get('marketing_approval_date', ''),
+                        'fda_sponsor_company': match_result.fda_drug.get('sponsor_company', ''),
+                        'fda_sponsor_state': match_result.fda_drug.get('sponsor_state', ''),
+                        'fda_sponsor_country': match_result.fda_drug.get('sponsor_country', ''),
                         'match_score': match_result.score,
                         'match_type': match_result.match_type,
                         'confidence_reason': match_result.confidence_reason
