@@ -11,8 +11,9 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from data_loader import load_cdsco_data, load_fda_data
-from fuzzy_matcher import DrugMatcher
 from date_formatter import standardize_dates
+from fuzzy_matcher import DrugMatcher
+from matching_config import MatchingThresholds, build_thresholds
 
 
 def _sanitize_output_tag(tag: str | None, threshold: int) -> str:
@@ -80,7 +81,20 @@ def create_overlap_report(matches, output_file: str = 'output/overlap.csv') -> p
     return output_df
 
 
-def analyze_matches(overlap_df: pd.DataFrame) -> None:
+def _expand_threshold_shorthand(argv: list[str]) -> list[str]:
+    """Allow CLI usage like `--90` to stand in for `--threshold 90`."""
+    expanded: list[str] = []
+    for arg in argv:
+        if arg.startswith("--") and arg[2:].isdigit():
+            expanded.extend(["--threshold", arg[2:]])
+        elif arg.isdigit():
+            expanded.extend(["--threshold", arg])
+        else:
+            expanded.append(arg)
+    return expanded
+
+
+def analyze_matches(overlap_df: pd.DataFrame, thresholds: MatchingThresholds) -> None:
     """Summarize overlap quality for rapid manual review.
 
     Args:
@@ -95,13 +109,21 @@ def analyze_matches(overlap_df: pd.DataFrame) -> None:
     print("\n=== OVERLAP ANALYSIS ===")
     print(f"Total overlapping drugs found: {len(overlap_df)}")
     
-    high_confidence = len(overlap_df[overlap_df['Match_Score'] >= 95])
-    medium_confidence = len(overlap_df[(overlap_df['Match_Score'] >= 85) & (overlap_df['Match_Score'] < 95)])
+    high_floor = thresholds.high_gate
+    medium_floor = thresholds.base
+    
+    high_confidence = len(overlap_df[overlap_df['Match_Score'] >= high_floor])
+    medium_confidence = len(
+        overlap_df[
+            (overlap_df['Match_Score'] >= medium_floor)
+            & (overlap_df['Match_Score'] < high_floor)
+        ]
+    )
     
     print(
         f"\nConfidence breakdown:\n"
-        f"  High confidence (≥95%): {high_confidence}\n"
-        f"  Medium confidence (85-94%): {medium_confidence}"
+        f"  High confidence (≥{high_floor}%): {high_confidence}\n"
+        f"  Medium confidence ({medium_floor}-{max(high_floor - 1, medium_floor)}%): {medium_confidence}"
     )
     
     print("\nTop 10 matches:")
@@ -177,7 +199,8 @@ def run_pipeline(threshold: int = 85, output_tag: str | None = None) -> bool:
         return False
     
     print("\nStep 2: Finding overlaps...")
-    matcher = DrugMatcher(threshold=threshold)
+    thresholds = build_thresholds(threshold)
+    matcher = DrugMatcher(threshold=thresholds.base, thresholds=thresholds)
     matches = matcher.find_overlaps(cdsco_df, fda_df)
     print(f"  Found {len(matches)} potential matches")
     
@@ -192,7 +215,7 @@ def run_pipeline(threshold: int = 85, output_tag: str | None = None) -> bool:
     if overlap_df is not None:
         print(f"  Report saved to: {report_path}")
         
-        analyze_matches(overlap_df)
+        analyze_matches(overlap_df, thresholds)
     
     return True
 
@@ -217,7 +240,9 @@ def main(argv: list[str] | None = None):
         help="Optional suffix for the overlap CSV (defaults to the threshold).",
     )
     
-    args = parser.parse_args(argv)
+    raw_args = argv if argv is not None else sys.argv[1:]
+    normalized_args = _expand_threshold_shorthand(list(raw_args))
+    args = parser.parse_args(normalized_args)
     
     if args.threshold < 0 or args.threshold > 100:
         parser.error("threshold must be between 0 and 100")

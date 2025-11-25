@@ -33,11 +33,13 @@ Execute the pipeline with the default 85% similarity threshold:
 python pipeline/run_analysis.py
 ```
 
-Adjust the threshold for stricter or more permissive matching:
+Adjust the threshold for stricter or more permissive matching (all fuzzy sub-thresholds will adjust automatically via `pipeline/matching_config.py`):
 
 ```bash
-python pipeline/run_analysis.py 90
-python pipeline/run_analysis.py 80
+python pipeline/run_analysis.py --threshold 90
+python pipeline/run_analysis.py --threshold 80
+# Shorthand when using the convenience wrapper:
+python run_pipeline.py --90
 ```
 
 The root-level `run_pipeline.py` script forwards the optional threshold argument to the same entry point.

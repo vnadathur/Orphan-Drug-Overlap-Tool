@@ -9,6 +9,8 @@ import pandas as pd
 from rapidfuzz import fuzz
 
 from data_loader import extract_active_ingredients, normalize_drug_name
+from matching_config import MatchingThresholds, build_thresholds
+from progress import CLIProgressBar
 
 
 @dataclass
@@ -26,9 +28,10 @@ class MatchResult:
 class EnhancedDrugMatcher:
     """Match CDSCO entries to FDA records with specialized heuristics."""
     
-    def __init__(self, threshold: int = 85):
+    def __init__(self, threshold: int = 85, thresholds: Optional[MatchingThresholds] = None):
         """Initialize matcher thresholds and normalization caches."""
-        self.threshold = threshold
+        self.threshold_config = thresholds or build_thresholds(threshold)
+        self.threshold = self.threshold_config.base
         self._normalization_cache = {}  # Cache normalized drug names
         
         # Salt form variations that represent the same active ingredient
@@ -144,16 +147,16 @@ class EnhancedDrugMatcher:
         
         # For performance, only do expensive normalizations if strings are somewhat similar
         quick_score = fuzz.ratio(str1_lower, str2_lower)
-        if quick_score < 70:  # Unlikely to match
+        if quick_score < self.threshold_config.quick_compare_floor:  # Unlikely to match
             return quick_score
         
         # Check if this might be a salt variant (only if quick score is promising)
-        if quick_score >= 80:
+        if quick_score >= self.threshold_config.salt_check_floor:
             base1 = self.normalize_for_salt_comparison(str1)
             base2 = self.normalize_for_salt_comparison(str2)
             
             if base1 == base2 and base1:  # Same drug, different salt
-                return 98  # Very high score but not perfect
+                return self.threshold_config.salt_gate  # Very high score but not perfect
         
         # Standard fuzzy matching
         scores = [
@@ -198,10 +201,12 @@ class EnhancedDrugMatcher:
                 if len(fda_generic_components) > 1:
                     for fda_comp in fda_generic_components:
                         fda_comp_base = self.normalize_for_salt_comparison(fda_comp)
-                        if self.calculate_similarity(cdsco_base, fda_comp_base) >= 90:
+                        if self.calculate_similarity(
+                            cdsco_base, fda_comp_base
+                        ) >= self.threshold_config.component_match:
                             return MatchResult(
                                 fda_drug=fda_drug,
-                                score=95,  # High score for component match
+                                score=self.threshold_config.high_gate,  # High score for component match
                                 match_type='combination_component',
                                 matched_components=[cdsco_drug],
                                 total_components=len(fda_generic_components),
@@ -224,15 +229,20 @@ class EnhancedDrugMatcher:
                         self.calculate_similarity(component, fda_drug.get('trade_normalized', ''))
                     )
                     
-                    if comp_score >= 85:
+                    if comp_score >= self.threshold_config.component_accept:
                         matched_components.append(component)
                 
                 # Calculate coverage
                 coverage = len(matched_components) / len(cdsco_components)
                 
                 # Accept partial matches if coverage is significant
-                if coverage >= 0.5 and coverage > best_coverage:  # At least 50% components match
+                if (
+                    coverage >= self.threshold_config.combination_min_coverage
+                    and coverage > best_coverage
+                ):
                     score = 80 + (coverage * 15)  # Score 80-95 based on coverage
+                    score = max(self.threshold_config.partial_combo_score_floor, score)
+                    score = min(100, score)
                     best_match = MatchResult(
                         fda_drug=fda_drug,
                         score=score,
@@ -288,11 +298,18 @@ class EnhancedDrugMatcher:
             salt_trade_score = self.calculate_similarity(cdsco_salt_normalized, fda_trade_salt_norm)
             
             # Take best score and track match type
+            salt_variant_floor = self.threshold_config.component_match
             scores = [
                 (generic_score, 'generic'),
                 (trade_score, 'trade'),
-                (salt_generic_score, 'salt_variant' if salt_generic_score > 90 else 'generic'),
-                (salt_trade_score, 'salt_variant' if salt_trade_score > 90 else 'trade')
+                (
+                    salt_generic_score,
+                    'salt_variant' if salt_generic_score >= salt_variant_floor else 'generic'
+                ),
+                (
+                    salt_trade_score,
+                    'salt_variant' if salt_trade_score >= salt_variant_floor else 'trade'
+                )
             ]
             
             max_score, score_type = max(scores, key=lambda x: x[0])
@@ -308,7 +325,7 @@ class EnhancedDrugMatcher:
                 confidence_reason = "Salt form variant of the same drug"
             elif best_score == 100:
                 confidence_reason = "Exact name match"
-            elif best_score >= 95:
+            elif best_score >= self.threshold_config.high_gate:
                 confidence_reason = "Very high similarity"
             
             return MatchResult(
@@ -355,21 +372,14 @@ class EnhancedDrugMatcher:
 
         total = len(cdsco_df)
         print(f"  Matching {total} CDSCO drugs...")
-
+        
+        progress = CLIProgressBar(total, label="Matching CDSCO records")
         if total == 0:
-            print("  Progress [----------------------------------------] 0.0%")
+            progress.complete()
             return matches
-
-        def render_progress(current: int) -> None:
-            bar_length = 40
-            filled = int(bar_length * current / total)
-            bar = '#' * filled + '-' * (bar_length - filled)
-            percent = (current / total) * 100
-            sys.stdout.write(f"\r  Progress [{bar}] {percent:5.1f}%")
-            sys.stdout.flush()
-
-        for idx, cdsco_row in cdsco_df.iterrows():
-            render_progress(idx + 1)
+        
+        for _, cdsco_row in cdsco_df.iterrows():
+            progress.advance()
             
             cdsco_drug = cdsco_row.get('Drug Name', '')
             cdsco_indication = cdsco_row.get('Indication', '')
@@ -422,9 +432,7 @@ class EnhancedDrugMatcher:
                     
                     matches.append(match_dict)
         
-        render_progress(total)
-        sys.stdout.write('\n')
-        sys.stdout.flush()
+        progress.complete()
 
         return matches
     
@@ -442,20 +450,21 @@ class EnhancedDrugMatcher:
         Raises:
             None
         """
+        cfg = self.threshold_config
         if not cdsco_indication or not fda_indication:
             # Can't verify without indications - be conservative
             # Only allow if drug match is very strong
-            return drug_match_score >= 95
+            return drug_match_score >= cfg.missing_indication_floor
         
         # Dynamic threshold based on drug name match confidence
-        if drug_match_score >= 98:  # Salt variants, exact matches
-            indication_threshold = 40  # Very lenient - different indications expected
-        elif drug_match_score >= 95:
-            indication_threshold = 50
-        elif drug_match_score >= 90:
-            indication_threshold = 65
+        if drug_match_score >= cfg.salt_gate:  # Salt variants, exact matches
+            indication_threshold = cfg.indication_loose  # Very lenient - different indications expected
+        elif drug_match_score >= cfg.high_gate:
+            indication_threshold = cfg.indication_medium
+        elif drug_match_score >= cfg.medium_gate:
+            indication_threshold = cfg.indication_strict
         else:
-            indication_threshold = 70
+            indication_threshold = cfg.indication_base
         
         # Calculate indication similarity
         similarity = self.calculate_similarity(cdsco_indication, fda_indication)
