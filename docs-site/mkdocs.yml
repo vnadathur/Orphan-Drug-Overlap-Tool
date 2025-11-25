@@ -5,10 +5,28 @@ theme:
   name: mkdocs
   highlightjs: true
   navigation_depth: 2
+plugins:
+  - search
+  - table-reader:
+      dir: ../output
 nav:
   - Home: index.md
-  - Installation: installation.md
-  - Data: data.md
-  - Overlaps: overlaps.md
-  - Analytics: analytics.md
-  - Correspondence: correspondence.md
+  - Installation:
+      - Overview: installation/index.md
+  - Data:
+      - Overview: data/index.md
+  - Overlaps:
+      - Overview: overlaps/index.md
+      - 100% Threshold: overlaps/overlap-100.md
+      - 95% Threshold: overlaps/overlap-95.md
+      - 90% Threshold: overlaps/overlap-90.md
+      - 85% Threshold: overlaps/overlap-85.md
+      - 80% Threshold: overlaps/overlap-80.md
+      - 75% Threshold: overlaps/overlap-75.md
+  - Analytics:
+      - Overview: analytics/index.md
+  - Correspondence:
+      - Overview: correspondence/index.md
+  - Paper:
+      - Overview: paper/index.md
+      - Same Drug, Different Indication: paper/different-indications.md

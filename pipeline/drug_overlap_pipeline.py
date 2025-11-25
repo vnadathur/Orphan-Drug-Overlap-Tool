@@ -1,6 +1,8 @@
 """Coordinate the CDSCO and FDA overlap workflow from load to analysis."""
 
+import argparse
 import os
+import re
 import sys
 
 import pandas as pd
@@ -11,6 +13,23 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data_loader import load_cdsco_data, load_fda_data
 from fuzzy_matcher import DrugMatcher
 from date_formatter import standardize_dates
+
+
+def _sanitize_output_tag(tag: str | None, threshold: int) -> str:
+    """Return a filesystem-friendly suffix for overlap reports."""
+    fallback = str(threshold)
+    if not tag:
+        return fallback
+    
+    cleaned = re.sub(r'[^A-Za-z0-9._-]+', '-', tag.strip()).strip('-._')
+    return cleaned or fallback
+
+
+def _build_output_path(base_path: str, threshold: int, output_tag: str | None) -> str:
+    """Derive the full path to the overlap report based on the selected threshold."""
+    safe_suffix = _sanitize_output_tag(output_tag, threshold)
+    filename = f"overlap-{safe_suffix}.csv"
+    return os.path.join(base_path, 'output', filename)
 
 
 def create_overlap_report(matches, output_file: str = 'output/overlap.csv') -> pd.DataFrame | None:
@@ -108,7 +127,7 @@ def analyze_matches(overlap_df: pd.DataFrame) -> None:
         print(f"  - {missing_fda_dates} FDA drugs missing approval dates")
 
 
-def run_pipeline(threshold: int = 85) -> bool:
+def run_pipeline(threshold: int = 85, output_tag: str | None = None) -> bool:
     """Execute loading, matching, reporting, and analytics in sequence.
 
     Args:
@@ -145,6 +164,7 @@ def run_pipeline(threshold: int = 85) -> bool:
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         cdsco_path = os.path.join(base_path, 'data', 'cdsco.csv')
         fda_path = os.path.join(base_path, 'data', 'FDA.csv')
+        report_path = _build_output_path(base_path, threshold, output_tag)
         
         cdsco_df = load_cdsco_data(cdsco_path)
         fda_df = load_fda_data(fda_path)
@@ -167,41 +187,52 @@ def run_pipeline(threshold: int = 85) -> bool:
         return False
     
     print("\nStep 3: Creating overlap report...")
-    overlap_df = create_overlap_report(matches)
+    overlap_df = create_overlap_report(matches, output_file=report_path)
     
     if overlap_df is not None:
-        print(f"  Report saved to: output/overlap.csv")
+        print(f"  Report saved to: {report_path}")
         
         analyze_matches(overlap_df)
     
     return True
 
 
-def main():
-    """Parse optional threshold argument then execute the pipeline."""
-    threshold = 85
-    if len(sys.argv) > 1:
-        try:
-            threshold = int(sys.argv[1])
-            if threshold < 0 or threshold > 100:
-                print("ERROR: Threshold must be between 0 and 100")
-                sys.exit(1)
-        except ValueError:
-            print("ERROR: Threshold must be a number")
-            sys.exit(1)
+def main(argv: list[str] | None = None):
+    """Parse CLI arguments then execute the pipeline."""
+    parser = argparse.ArgumentParser(
+        description="Run the Orphan Drug overlap analysis pipeline."
+    )
+    parser.add_argument(
+        "-t",
+        "--threshold",
+        type=int,
+        default=85,
+        help="Overall fuzzy match threshold (0-100). Default: 85",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-tag",
+        type=str,
+        default=None,
+        help="Optional suffix for the overlap CSV (defaults to the threshold).",
+    )
     
-    # Run pipeline
-    success = run_pipeline(threshold)
+    args = parser.parse_args(argv)
+    
+    if args.threshold < 0 or args.threshold > 100:
+        parser.error("threshold must be between 0 and 100")
+    
+    success = run_pipeline(threshold=args.threshold, output_tag=args.output_tag)
     
     if not success:
         sys.exit(1)
     
     print("\n=== PIPELINE COMPLETE ===")
-    print("Review output/overlap.csv for results")
+    print("Review the generated overlap CSV inside the output directory.")
     print("\nTo adjust results:")
-    print("  - Increase threshold for fewer, more accurate matches")
-    print("  - Decrease threshold for more matches (may include false positives)")
-    print(f"\nRerun with different threshold: python {sys.argv[0]} <threshold>")
+    print("  - Increase the threshold for fewer, more accurate matches")
+    print("  - Decrease the threshold for broader coverage (may include false positives)")
+    print(f"\nExample: python {sys.argv[0]} --threshold 90 --output-tag pilot")
 
 
 if __name__ == "__main__":

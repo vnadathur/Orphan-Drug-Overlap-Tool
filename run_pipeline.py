@@ -15,12 +15,8 @@ import sys
 import os
 
 if __name__ == "__main__":
-    # Build command
-    cmd = [sys.executable, os.path.join("pipeline", "run_analysis.py")]
-    
-    # Add threshold argument if provided
-    if len(sys.argv) > 1:
-        cmd.append(sys.argv[1])
+    # Build command and forward any CLI args to the pipeline runner
+    cmd = [sys.executable, os.path.join("pipeline", "run_analysis.py"), *sys.argv[1:]]
     
     # Run the pipeline
     subprocess.run(cmd)
