@@ -1,9 +1,21 @@
-# Overlap Reports
+# Overlaps
 
-Select a threshold-specific page from the sidebar to browse CDSCO ↔︎ FDA drug name pairs captured at that similarity cutoff. Each page includes:
+Each threshold page shows CDSCO-FDA drug pairs that cleared that similarity cutoff.
 
-- A clearly labeled download link to the raw CSV (with every column).
-- An embedded two-column view (CDSCO drug ↔︎ FDA drug) rendered directly from the CSV via `mkdocs-table-reader-plugin`.
+## Thresholds
 
-Start with 85% (the default pipeline setting), then explore the tighter or more permissive thresholds as needed for your analysis.
+| Level | Use Case |
+|-------|----------|
+| 100% | Exact matches only |
+| 95% | Near-exact, minor spelling differences |
+| 90% | High confidence |
+| 85% | Default pipeline setting |
+| 80% | Broader recall |
+| 75% | Exploratory, higher false positive risk |
 
+## Page Contents
+
+- Download link to full CSV
+- Embedded table: drug names and indications from both sources
+
+Start at 85%, adjust as needed.

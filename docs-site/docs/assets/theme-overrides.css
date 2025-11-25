@@ -1,0 +1,34 @@
+:root {
+  --md-primary-fg-color: #1e1e1e;
+  --md-primary-bg-color: #1e1e1e;
+}
+
+.md-header__button.md-logo { display: none; }
+.md-header, .md-tabs { background-color: #1e1e1e; box-shadow: none; }
+
+/* Typography */
+.md-typeset { font-size: 0.82rem; line-height: 1.5; }
+.md-typeset h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+.md-typeset h2 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; }
+.md-typeset p { margin: 0.5rem 0; }
+
+/* Tables: auto width, no forced 100% */
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+  border-collapse: collapse;
+  width: auto;
+}
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.md-typeset table:not([class]) th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+}
+
+/* Code */
+.md-typeset code { font-size: 0.75rem; }
+.md-typeset pre code { font-size: 0.7rem; line-height: 1.4; }

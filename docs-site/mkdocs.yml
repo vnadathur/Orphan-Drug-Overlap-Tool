@@ -1,32 +1,49 @@
-site_name: Orphan Drug Overlap Tool
-site_description: Documentation for the Orphan Drug overlap analysis pipeline
+site_name: Orphan Drug Access in India
+site_description: CDSCO-FDA orphan drug overlap analysis
 repo_url: https://github.com/vnadathur/Orphan-Drug-Overlap-Tool
+
 theme:
-  name: mkdocs
-  highlightjs: true
-  navigation_depth: 2
+  name: material
+  palette:
+    scheme: slate
+    primary: black
+    accent: amber
+  font:
+    text: Source Sans Pro
+    code: JetBrains Mono
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - toc.integrate
+
 plugins:
   - search
   - table-reader:
-      dir: ../output
+      data_path: ../output
+
+extra_css:
+  - assets/theme-overrides.css
+
 nav:
   - Home: index.md
-  - Installation:
-      - Overview: installation/index.md
-  - Data:
-      - Overview: data/index.md
+  - Installation: installation/index.md
+  - Data: data/index.md
   - Overlaps:
-      - Overview: overlaps/index.md
-      - 100% Threshold: overlaps/overlap-100.md
-      - 95% Threshold: overlaps/overlap-95.md
-      - 90% Threshold: overlaps/overlap-90.md
-      - 85% Threshold: overlaps/overlap-85.md
-      - 80% Threshold: overlaps/overlap-80.md
-      - 75% Threshold: overlaps/overlap-75.md
-  - Analytics:
-      - Overview: analytics/index.md
-  - Correspondence:
-      - Overview: correspondence/index.md
+      - overlaps/index.md
+      - 100%: overlaps/overlap-100.md
+      - 95%: overlaps/overlap-95.md
+      - 90%: overlaps/overlap-90.md
+      - 85%: overlaps/overlap-85.md
+      - 80%: overlaps/overlap-80.md
+      - 75%: overlaps/overlap-75.md
   - Paper:
-      - Overview: paper/index.md
+      - paper/index.md
       - Same Drug, Different Indication: paper/different-indications.md
+      - State Sponsorships: paper/american-state-sponsorships.md
+      - Company Sponsors: paper/sponsors-for-every-of-the-140.md
+      - India After FDA: paper/which-drugs-did-india-approve-after-fda.md
+      - India Before FDA: paper/which-drugs-did-india-approve-before-fda.md

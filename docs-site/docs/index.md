@@ -1,17 +1,30 @@
 # Orphan Drug Overlap Tool
 
-## Purpose
+Identifies FDA orphan drugs that also appear in India's CDSCO registry.
 
-This project tracks therapies that already earned FDA orphan approval yet also appear in India's CDSCO records. When those listings diverge in indication text, the drugs become immediate candidates for additional advocacy in India. Matching the two datasets required consistent drug names, unified date formats, and transparent reporting so public health teams can review overlaps quickly.
+## What It Does
 
-## Data Sources
+- Loads CDSCO and FDA CSV datasets
+- Normalizes drug names (salts, combinations, dosage noise)
+- Scores matches via RapidFuzz token similarity
+- Exports overlap reports at configurable thresholds
 
-The pipeline consumes two CSV inputs that live under `data/`. `cdsco.csv` captures small molecules and combinations drawn from the CDSCO portal, while `FDA.csv` lists orphan drugs with sponsor metadata, approval dates, and therapeutic statements. Cleaning focuses on salt removal, parenthetical trimming, and normalization of combination components so the matcher can compare like with like.
+## Inputs
 
-## Pipeline Highlights
+| File | Contents |
+|------|----------|
+| `data/cdsco.csv` | Indian drug approvals from CDSCO portal |
+| `data/FDA.csv` | US orphan drug designations with sponsor metadata |
 
-Data loading standardizes names, resolves dosage noise, and stores helper columns the matcher can reuse. The matcher relies on RapidFuzz scoring, combination-aware logic, and indication cross-checks so clear wins surface to the top of each report. Dates move through the formatter so the overlap CSV always presents MM/DD/YYYY values, and the orchestrator writes one file per threshold to `output/overlap-<tag>.csv`.
+## Outputs
 
-## Using These Docs
+| File | Contents |
+|------|----------|
+| `output/overlap-<threshold>.csv` | Matched drug pairs with scores, dates, indications |
 
-Use the Installation section when setting up the pipeline or experimenting with thresholds. Visit Data, Overlaps, Analytics, Correspondence, and Paper for deeper dives once you are ready to work with the generated output. Each overlap tab embeds the CDSCO and FDA drug names for its threshold and offers a direct download of the corresponding CSV so you can continue the analysis offline.
+## Navigation
+
+- **Installation** - Setup, CLI flags
+- **Data** - Source schemas
+- **Overlaps** - Browse matches by threshold
+- **Paper** - Raw tables for publication
