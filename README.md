@@ -1,7 +1,44 @@
 # Orphan Drug Overlap Tool
 </div>
 
----
+## Paper Tables and Overlap Data
+
+This repository separates the finalized tables used in the paper from the broader overlap datasets produced by the pipeline. Use the folders below depending on whether you want the curated manuscript tables or the full threshold-based outputs.
+
+### Paper Tables
+These files correspond directly to the tables referenced in the paper. Each link points to the exact CSV stored in the `Paper Tables/` folder.
+
+- **Which drugs did India approve *before* FDA?**  
+  [`which-drugs-did-india-approve-before-fda.csv`](./Paper%20Tables/which-drugs-did-india-approve-before-fda.csv)
+
+- **Which drugs did India approve *after* FDA?**  
+  [`which-drugs-did-india-approve-after-fda.csv`](./Paper%20Tables/which-drugs-did-india-approve-after-fda.csv)
+
+- **Sponsors for all 140 overlapping drugs (ranked by count)**  
+  [`ranked-sponsors.csv`](./Paper%20Tables/ranked-sponsors.csv)
+
+- **Which drugs have the same indication across FDA and CDSCO?**  
+  *(These represent drugs approved for orphan-relevant purposes in both systems.)*  
+  See: [`same-drug-different-indication.csv`](./Paper%20Tables/same-drug-different-indication.csv)  
+  Additional experimental analysis can also be found in the `experiments/` folder.
+
+- **State-level sponsorship distribution in the United States**  
+  [`ranked-american-state-sponsors.csv`](./Paper%20Tables/ranked-american-state-sponsors.csv)
+
+### Varied Threshold Overlaps
+These files contain the broader overlap outputs produced at different similarity thresholds. They support exploration of lower-confidence matches and are not limited to the curated subsets used in the paper.
+
+Folder: [`varied threshold overlaps/`](./varied%20threshold%20overlaps)
+
+Examples:
+- [`overlap-100.csv`](./varied%20threshold%20overlaps/overlap-100.csv)
+- [`overlap-95.csv`](./varied%20threshold%20overlaps/overlap-95.csv)
+- [`overlap-90.csv`](./varied%20threshold%20overlaps/overlap-90.csv)
+- [`overlap-85.csv`](./varied%20threshold%20overlaps/overlap-85.csv)
+- [`overlap-80.csv`](./varied%20threshold%20overlaps/overlap-80.csv)
+- [`overlap-75.csv`](./varied%20threshold%20overlaps/overlap-75.csv)
+
+Use these files if you want to inspect relaxed match criteria, run additional experiments, or replicate the threshold-dependent behavior of the tool.
 
 # Drug Overlap Analysis Pipeline
 
