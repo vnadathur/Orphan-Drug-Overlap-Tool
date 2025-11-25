@@ -1,0 +1,14 @@
+site_name: Orphan Drug Overlap Tool
+site_description: Documentation for the Orphan Drug overlap analysis pipeline
+repo_url: https://github.com/vnadathur/Orphan-Drug-Overlap-Tool
+theme:
+  name: mkdocs
+  highlightjs: true
+  navigation_depth: 2
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Data: data.md
+  - Overlaps: overlaps.md
+  - Analytics: analytics.md
+  - Correspondence: correspondence.md
