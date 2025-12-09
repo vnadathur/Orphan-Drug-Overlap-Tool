@@ -1,0 +1,61 @@
+[
+  {
+    "threshold": 75,
+    "tp": 5,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "predicted": [
+      "abacavir sulfate",
+      "amoxicillin trihydrate",
+      "atenolol & chlorthalidone",
+      "lamivudin",
+      "zidovudine"
+    ]
+  },
+  {
+    "threshold": 85,
+    "tp": 5,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "predicted": [
+      "abacavir sulfate",
+      "amoxicillin trihydrate",
+      "atenolol & chlorthalidone",
+      "lamivudin",
+      "zidovudine"
+    ]
+  },
+  {
+    "threshold": 90,
+    "tp": 5,
+    "fp": 0,
+    "fn": 0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "predicted": [
+      "abacavir sulfate",
+      "amoxicillin trihydrate",
+      "atenolol & chlorthalidone",
+      "lamivudin",
+      "zidovudine"
+    ]
+  },
+  {
+    "threshold": 95,
+    "tp": 4,
+    "fp": 0,
+    "fn": 1,
+    "precision": 1.0,
+    "recall": 0.8,
+    "predicted": [
+      "abacavir sulfate",
+      "amoxicillin trihydrate",
+      "atenolol & chlorthalidone",
+      "zidovudine"
+    ]
+  }
+]

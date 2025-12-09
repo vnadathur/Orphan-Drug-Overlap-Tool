@@ -1,0 +1,59 @@
+{
+  "threshold": 85,
+  "matches_found": 3,
+  "match_names": [
+    "amoxicillin trihydrate",
+    "atenolol & chlorthalidone",
+    "zidovudine"
+  ],
+  "details": [
+    {
+      "cdsco_drug": "zidovudine",
+      "cdsco_indication": "HIV treatment",
+      "cdsco_approval_date": "01/04/1988",
+      "fda_drug": "zidovudine",
+      "fda_generic": "zidovudine",
+      "fda_trade": "Retrovir",
+      "fda_indication": "HIV treatment",
+      "fda_marketing_approval_date": "03/19/1987",
+      "fda_sponsor_company": "Glaxo Wellcome Inc.",
+      "fda_sponsor_state": "North Carolina",
+      "fda_sponsor_country": "United States",
+      "match_score": 100,
+      "match_type": "generic",
+      "confidence_reason": "Exact name match"
+    },
+    {
+      "cdsco_drug": "amoxicillin trihydrate",
+      "cdsco_indication": "Bacterial infection",
+      "cdsco_approval_date": "02/02/2000",
+      "fda_drug": "amoxicillin",
+      "fda_generic": "amoxicillin",
+      "fda_trade": "Amoxil",
+      "fda_indication": "Bacterial infection",
+      "fda_marketing_approval_date": "05/05/1999",
+      "fda_sponsor_company": "Beecham",
+      "fda_sponsor_state": "New Jersey",
+      "fda_sponsor_country": "United States",
+      "match_score": 100,
+      "match_type": "salt_variant",
+      "confidence_reason": "Salt form variant of the same drug"
+    },
+    {
+      "cdsco_drug": "atenolol & chlorthalidone",
+      "cdsco_indication": "Hypertension combination",
+      "cdsco_approval_date": "04/04/2002",
+      "fda_drug": "atenolol and chlorthalidone",
+      "fda_generic": "atenolol and chlorthalidone",
+      "fda_trade": "Tenoretic",
+      "fda_indication": "Hypertension combination",
+      "fda_marketing_approval_date": "06/06/1998",
+      "fda_sponsor_company": "AstraZeneca",
+      "fda_sponsor_state": "Delaware",
+      "fda_sponsor_country": "United States",
+      "match_score": 95.83333333333333,
+      "match_type": "generic",
+      "confidence_reason": "Very high similarity"
+    }
+  ]
+}
